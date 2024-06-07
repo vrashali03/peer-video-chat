@@ -1,68 +1,36 @@
-import { useEffect, useRef, useState } from 'react';
-import Peer from 'peerjs';
-import './App.css';
+import React, { useState } from 'react';
+import VideoCall from '../VideoCall';
 
-function App() {
-  const [peerId, setPeerId] = useState('');
-  const [remotePeerIdValue, setRemotePeerIdValue] = useState('');
-  const remoteVideoRef = useRef(null);
-  const currentUserVideoRef = useRef(null);
-  const peerInstance = useRef(null);
+const App = () => {
+  const [userId, setUserId] = useState('');
+  const [receiverId, setReceiverId] = useState('');
 
-  useEffect(() => {
-    const peer = new Peer();
+  const handleUserIdChange = (e) => {
+    setUserId(e.target.value);
+  };
 
-    peer.on('open', (id) => {
-      setPeerId(id)
-    });
-
-    peer.on('call', (call) => {
-      var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
-      getUserMedia({ video: true, audio: true }, (mediaStream) => {
-        currentUserVideoRef.current.srcObject = mediaStream;
-        currentUserVideoRef.current.play();
-        call.answer(mediaStream)
-        call.on('stream', function(remoteStream) {
-          remoteVideoRef.current.srcObject = remoteStream
-          remoteVideoRef.current.play();
-        });
-      });
-    })
-
-    peerInstance.current = peer;
-  }, [])
-
-  const call = (remotePeerId) => {
-    var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
-    getUserMedia({ video: true, audio: true }, (mediaStream) => {
-
-      currentUserVideoRef.current.srcObject = mediaStream;
-      currentUserVideoRef.current.play();
-
-      const call = peerInstance.current.call(remotePeerId, mediaStream)
-
-      call.on('stream', (remoteStream) => {
-        remoteVideoRef.current.srcObject = remoteStream
-        remoteVideoRef.current.play();
-      });
-    });
-  }
+  const handleReceiverIdChange = (e) => {
+    setReceiverId(e.target.value);
+  };
 
   return (
-    <div className="App">
-      <h1>Current user id is {peerId}</h1>
-      <input type="text" value={remotePeerIdValue} onChange={e => setRemotePeerIdValue(e.target.value)} />
-      <button onClick={() => call(remotePeerIdValue)}>Call</button>
+    <div>
+      <h1>Video Call App</h1>
       <div>
-        <video ref={currentUserVideoRef} />
+        <label>
+          Your ID:
+          <input type="text" value={userId} onChange={handleUserIdChange} />
+        </label>
       </div>
       <div>
-        <video ref={remoteVideoRef} />
+        <label>
+          Receiver ID:
+          <input type="text" value={receiverId} onChange={handleReceiverIdChange} />
+        </label>
       </div>
+      <VideoCall userId={userId} receiverId={receiverId} />
     </div>
   );
-}
+};
 
 export default App;
