@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import VideoCall from '../VideoCall';
+import VideoCall from './VideoCall';
 
 const App = () => {
   const [userId, setUserId] = useState('');
